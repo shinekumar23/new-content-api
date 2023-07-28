@@ -2,7 +2,7 @@
 # BUILD FOR LOCAL DEVELOPMENT
 ###################
 
-FROM node:18.16.0-alpine As development
+FROM node:18.16.0-alpine AS development
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -25,7 +25,7 @@ USER node
 # BUILD FOR PRODUCTION
 ###################
 
-FROM node:18.16.0-alpine As build
+FROM node:18.16.0-alpine AS build
 
 WORKDIR /usr/src/app
 
@@ -51,32 +51,14 @@ USER node
 # PRODUCTION
 ###################
 
-FROM node:18.16.0-alpine As production
+FROM node:18.16.0-alpine AS production
 
 WORKDIR /usr/src/app
-
-ARG DB_USERNAME=${DB_USERNAME}
-ARG DB_HOST=${DB_HOST}
-ARG DB_PASSWORD=${DB_PASSWORD}
-ARG DB_DATABASE=${DB_DATABASE}
 
 # Copy the bundled code from the build stage to the production image
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 COPY --chown=node:node --from=build /usr/src/app/env ./env
-
-# Set the environment variables
-ARG DB_HOST
-ARG DB_USERNAME
-ARG DB_PASSWORD
-ARG DB_DATABASE
-
-# Set the environment variables
-ENV DB_HOST=$DB_HOST
-ENV DB_USERNAME=$DB_USERNAME
-ENV DB_PASSWORD=$DB_PASSWORD
-ENV DB_DATABASE=$DB_DATABASE
-
 
 # Start the server using the production build
 CMD [ "node", "dist/main.js" ]
