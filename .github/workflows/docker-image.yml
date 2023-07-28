@@ -38,7 +38,7 @@ jobs:
         aws configure set aws_secret_access_key $AWS_SECRET_KEY
         aws configure set region $REGION
         aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_REPO_URL
-        docker build --build-arg DB_HOST=$DB_HOST --build-arg DB_USERNAME=$DB_USERNAME --build-arg DB_DATABASE=$DB_DATABASE --build-arg DB_PASSWORD=$DB_PASSWORD -t $ECR_REPO_URL:$build_version .
+        docker build -t $ECR_REPO_URL:$build_version .
         docker push $ECR_REPO_URL:$build_version
         sed -i "s/$ECR_REPO_NAME:[0-9]\+$/$ECR_REPO_NAME:$build_version/" deployment/$ENVIRONMENT/deployment.yaml
         git config --local user.email $GIT_USER_EMAIL
