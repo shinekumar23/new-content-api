@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: content-api
-          image: 276020727502.dkr.ecr.us-east-2.amazonaws.com/content:00
+          image: 276020727502.dkr.ecr.us-east-2.amazonaws.com/content:7
           env:
             - name: NODE_ENV
               value: production
