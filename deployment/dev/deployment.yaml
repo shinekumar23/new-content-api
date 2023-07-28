@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: content-api-deployment
-  namespace: test-content 
 spec:
   replicas: 1
   selector:
@@ -19,5 +18,25 @@ spec:
           env:
             - name: NODE_ENV
               value: production
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-username-secret
+                  key: DB_USERNAME
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: db-host-secret
+                  key: DB_HOST
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-password-secret
+                  key: DB_PASSWORD
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: db-database-secret
+                  key: DB_DATABASE
           ports:
             - containerPort: 3000
