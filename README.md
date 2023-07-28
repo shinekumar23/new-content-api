@@ -1,6 +1,6 @@
 ## Description
 
-APIs for content authoring 1 2
+APIs for content authoring 1 2 3
 
 ## Installation
 
