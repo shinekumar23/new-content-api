@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: content-api-ingress
+  namespace: test-content 
   annotations:
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:977558945179:certificate/68845a99-3bfc-4713-a602-8ab2c7be9753
     alb.ingress.kubernetes.io/group.name: cognianxtgendev
