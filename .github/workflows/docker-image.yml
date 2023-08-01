@@ -45,7 +45,7 @@ jobs:
         export KUBECONFIG=~/.kube/kubeconfig_cognianxtgen
         export KUBE_CONFIG_PATH=$KUBECONFIG
         NEW_DB_PASSWORD_BASE64=$(echo -n $NODE_ENV | base64)
-        kubectl patch secret db-secrets -p '{"data":{"NODE_ENV":"'$NEW_DB_PASSWORD_BASE64'"}}'
+        kubectl patch secret db-secrets -p '{"data":{"NODE_ENV":"'$NEW_DB_PASSWORD_BASE64'"}}' -n test-content
         sed -i "s/$ECR_REPO_NAME:[0-9]\+$/$ECR_REPO_NAME:$build_version/" deployment/$ENVIRONMENT/deployment.yaml
         git config --local user.email $GIT_USER_EMAIL
         git config --local user.name $GIT_USER_USERNAME
