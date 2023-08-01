@@ -22,6 +22,7 @@ jobs:
         DB_USERNAME: ${{ vars.DEV_DB_USERNAME }}
         DB_PASSWORD: ${{ secrets.DEV_DB_PASSWORD }}
         DB_DATABASE: ${{ vars.DEV_DB_DATABASE }}
+        NODE_ENV: ${{ secrets.DEV_NODE_ENV }}
         AWS_ACCESS_KEY: ${{ secrets.DEV_AWS_ACCESS_KEY }}
         AWS_SECRET_KEY: ${{ secrets.DEV_AWS_SECRET_KEY }}
         ECR_REPO_URL: ${{ vars.DEV_ECR_REPO_URL }}
@@ -40,6 +41,11 @@ jobs:
         aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_REPO_URL
         docker build -t $ECR_REPO_URL:$build_version .
         docker push $ECR_REPO_URL:$build_version
+        aws --region us-east-2 eks update-kubeconfig --name cognianxtgen --kubeconfig ~/.kube/kubeconfig_cognianxtgen
+        export KUBECONFIG=~/.kube/kubeconfig_cognianxtgen
+        export KUBE_CONFIG_PATH=$KUBECONFIG
+        NEW_DB_PASSWORD_BASE64=$(echo -n $NODE_ENV | base64)
+        kubectl patch secret db-secrets -p '{"data":{"NODE_ENV":"'$NEW_DB_PASSWORD_BASE64'"}}'
         sed -i "s/$ECR_REPO_NAME:[0-9]\+$/$ECR_REPO_NAME:$build_version/" deployment/$ENVIRONMENT/deployment.yaml
         git config --local user.email $GIT_USER_EMAIL
         git config --local user.name $GIT_USER_USERNAME
