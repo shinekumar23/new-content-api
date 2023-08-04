@@ -11,4 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: |
-        echo The PR was merged and the commit message contains the specific message
+          commit_message=$(git log --format=%B -n 1 ${{ github.sha }})
+          if [[ $commit_message != *"build"* ]]; then
+            echo "Commit message does not contain the specific text. Exiting."
+            exit 0
+          fi
+          echo The PR was merged
