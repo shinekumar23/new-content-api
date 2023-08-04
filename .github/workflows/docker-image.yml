@@ -6,11 +6,9 @@ on:
       - closed
 
 jobs:
-  if_merged_and_specific_message:
-    if: |
-      github.event.pull_request.merged == true &&
-      contains(github.event.pull_request.head_commit.message, 'build')
+  if_merged:
+    if: github.event.pull_request.merged == true && contains(github.event.head_commit.message, 'build')
     runs-on: ubuntu-latest
     steps:
     - run: |
-        echo The PR was merged and contains the specific message
+        echo The PR was merged
