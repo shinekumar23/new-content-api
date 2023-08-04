@@ -30,7 +30,7 @@ jobs:
         GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
         GIT_USER_USERNAME: ${{ secrets.GIT_USER_USERNAME }}
         
-      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.head_commit.message == 'dev-build'
+      if: github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.head_commit.message == 'dev-build'
       run: |
         set -x
         build_version=${GITHUB_RUN_NUMBER}
