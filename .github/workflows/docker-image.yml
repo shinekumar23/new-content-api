@@ -45,5 +45,6 @@ jobs:
         git config --local user.name $GIT_USER_USERNAME
         git branch
         git checkout -b argocd
+        git pull origin argocd 
         git commit -a -m "Updated version tag"
         git push origin argocd
