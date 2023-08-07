@@ -5,7 +5,7 @@ APIs for content authoring 1 2 3 4 5 6 7 8
 ## Installation
 
 ```bash
-$ npm install hello how are you welcome to ooty nice to met you hello man
+$ npm install hello how are you welcome to ooty nice to met you hello man hello
 ```
 
 ## Running the app
