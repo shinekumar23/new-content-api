@@ -43,6 +43,7 @@ jobs:
         sed -i "s/$ECR_REPO_NAME:[0-9]\+$/$ECR_REPO_NAME:$build_version/" deployment/$ENVIRONMENT/deployment.yaml
         git config --local user.email $GIT_USER_EMAIL
         git config --local user.name $GIT_USER_USERNAME
-        git commit -a -m "Updated version tag"
+        git branch
         git checkout argocd
+        git commit -a -m "Updated version tag"
         git push origin argocd
