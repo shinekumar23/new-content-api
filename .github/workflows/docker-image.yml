@@ -1,19 +1,48 @@
+name: Docker Image CI
+
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - closed
+  push:
+    branches: [ "main" ]
+
 
 jobs:
-  if_merged:
-    if: github.event.pull_request.merged == true
+
+  build:
+
     runs-on: ubuntu-latest
+    environment: dev
     steps:
-    - run: |
-          commit_message=$(git log --format=%B -n 1 ${{ github.sha }})
-          if [[ $commit_message != *"build"* ]]; then
-            echo "Commit message does not contain the specific text. Exiting."
-            exit 0
-          fi
-          echo The PR was merged
+    - uses: actions/checkout@v3
+      id: build
+    - name: Build the Docker image
+      env:
+        ENVIRONMENT: ${{ vars.DEV_ENVIRNMENT }}
+        DB_HOST: ${{ vars.DEV_DB_HOST }}
+        DB_USERNAME: ${{ vars.DEV_DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DEV_DB_PASSWORD }}
+        DB_DATABASE: ${{ vars.DEV_DB_DATABASE }}
+        NODE_ENV: ${{ secrets.DEV_NODE_ENV }}
+        AWS_ACCESS_KEY: ${{ secrets.DEV_AWS_ACCESS_KEY }}
+        AWS_SECRET_KEY: ${{ secrets.DEV_AWS_SECRET_KEY }}
+        ECR_REPO_URL: ${{ vars.DEV_ECR_REPO_URL }}
+        ECR_REPO_NAME: ${{ vars.DEV_ECR_REPO_NAME }}
+        REGION: ${{ vars.REGION }}
+        GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
+        GIT_USER_USERNAME: ${{ secrets.GIT_USER_USERNAME }}
+        
+      if: contains(github.event.head_commit.message, 'dev-build')
+      run: |
+        set -x
+        build_version=${GITHUB_RUN_NUMBER}
+        aws configure set aws_access_key_id $AWS_ACCESS_KEY
+        aws configure set aws_secret_access_key $AWS_SECRET_KEY
+        aws configure set region $REGION
+        aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_REPO_URL
+        docker build -t $ECR_REPO_URL:$build_version .
+        docker push $ECR_REPO_URL:$build_version
+        sed -i "s/$ECR_REPO_NAME:[0-9]\+$/$ECR_REPO_NAME:$build_version/" deployment/$ENVIRONMENT/deployment.yaml
+        git config --local user.email $GIT_USER_EMAIL
+        git config --local user.name $GIT_USER_USERNAME
+        git commit -a -m "Updated version tag"
+        git checkout argocd
+        git push origin argocd
