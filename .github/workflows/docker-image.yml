@@ -37,9 +37,10 @@ jobs:
         GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
         GIT_USER_USERNAME: ${{ secrets.GIT_USER_USERNAME }}
 
-         echo ${{ github.event.inputs.version }} 
+
       if: contains(github.event.head_commit.message, 'dev-build')
       run: |
+        echo ${{ github.event.inputs.version }} 
         set -x
         build_version=${GITHUB_RUN_NUMBER}
         aws configure set aws_access_key_id $AWS_ACCESS_KEY
