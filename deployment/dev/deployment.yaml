@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: content-api
-          image: 252078852689.dkr.ecr.us-west-2.amazonaws.com/content-api:75
+          image: 252078852689.dkr.ecr.us-west-2.amazonaws.com/content-api:77
           envFrom:
             - secretRef:
                 name: db-secrets
