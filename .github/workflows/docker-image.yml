@@ -7,7 +7,7 @@ on:
     inputs:
       version:
         description: Bump Version
-        default: v1.0.0
+        default: build
         required: true
 
 jobs:
@@ -38,9 +38,8 @@ jobs:
         GIT_USER_USERNAME: ${{ secrets.GIT_USER_USERNAME }}
 
 
-      if: contains(github.event.head_commit.message, 'dev-build')
+      if: contains(github.event.head_commit.message, 'dev-build') || github.event.inputs.version == 'build'
       run: |
-        echo ${{ github.event.inputs.version }} 
         set -x
         build_version=${GITHUB_RUN_NUMBER}
         aws configure set aws_access_key_id $AWS_ACCESS_KEY
