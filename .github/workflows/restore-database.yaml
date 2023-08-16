@@ -31,11 +31,13 @@ jobs:
         AWS_SECRET_KEY: ${{ secrets.DEV_AWS_SECRET_KEY }}
         REGION: ${{ vars.REGION }}
 
-
       if: github.event.inputs.version == 'Restore'
       run: |
-        echo "Hello"
-        aws s3 cp s3://cognianextgen-rds-backup/data.sql . --region us-east-2
+        set -x
+        aws configure set aws_access_key_id $AWS_ACCESS_KEY
+        aws configure set aws_secret_access_key $AWS_SECRET_KEY
+        aws configure set region $REGION
+        aws s3 cp s3://cognianextgen-rds-backup/data.sql .
         PGPASSWORD=Agb09hbs2 pg_dump -h cognianxtgen.cluster-cpdaobpdl4ur.us-east-2.rds.amazonaws.com -U cognianxtgenuser -d cognianxtgendb -f backup.sql
         # Check if the dump command was successful (exit status 0)
         if [ $? -eq 0 ]; then
