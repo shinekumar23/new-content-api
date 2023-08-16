@@ -23,19 +23,13 @@ jobs:
           fetch-depth: 0
     - name: Build the Docker image
       env:
-        ENVIRONMENT: ${{ vars.DEV_ENVIRNMENT }}
         DB_HOST: ${{ vars.DEV_DB_HOST }}
         DB_USERNAME: ${{ vars.DEV_DB_USERNAME }}
         DB_PASSWORD: ${{ secrets.DEV_DB_PASSWORD }}
         DB_DATABASE: ${{ vars.DEV_DB_DATABASE }}
-        NODE_ENV: ${{ secrets.DEV_NODE_ENV }}
         AWS_ACCESS_KEY: ${{ secrets.DEV_AWS_ACCESS_KEY }}
         AWS_SECRET_KEY: ${{ secrets.DEV_AWS_SECRET_KEY }}
-        ECR_REPO_URL: ${{ vars.DEV_ECR_REPO_URL }}
-        ECR_REPO_NAME: ${{ vars.DEV_ECR_REPO_NAME }}
         REGION: ${{ vars.REGION }}
-        GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
-        GIT_USER_USERNAME: ${{ secrets.GIT_USER_USERNAME }}
 
 
       if: github.event.inputs.version == 'Restore'
