@@ -42,3 +42,6 @@ jobs:
           sed -i "s/eva-test:[0-9]\+$/eva-test:$IMAGE_TAG/" deployment/dev/deployment.yaml
           git commit -a -m "Updated version tag"
           git push origin main
+          aws eks update-kubeconfig --region us-west-2 --name test-eva
+          kubectl get ns
+
