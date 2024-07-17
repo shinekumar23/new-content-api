@@ -33,3 +33,5 @@ jobs:
         run: |
           aws sts get-caller-identity
           aws s3 ls
+          aws eks update-kubeconfig --region us-west-2 --name test-eva
+          kubectl get ns
