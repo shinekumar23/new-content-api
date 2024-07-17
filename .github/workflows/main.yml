@@ -1,48 +1,37 @@
-# This is a basic workflow to help you get started with Actions
-#name:Connect to an AWS role from a GitHub repository
+name: Deploy to ECR
 
-# Controls when the action will run. Invokes the workflow on push events but only for the main branch
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
-env:
-  
-  AWS_REGION : us-west-2 #Change to reflect your Region
-
-# Permission can be added at job level or workflow level    
-permissions:
-      id-token: write   # This is required for requesting the JWT
-      contents: read    # This is required for actions/checkout
 jobs:
-  AssumeRoleAndCallIdentity:
+  deploy:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v3
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1.7.0
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials from GITHUB_TOKEN
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::252078852689:role/GitHubAction-AssumeRoleWithAction #change to reflect your IAM role’s ARN
-          role-session-name: GitHub_to_AWS_via_FederatedOIDC
-          aws-region: ${{ env.AWS_REGION }}
-      # Hello from AWS: WhoAmI
-      - name: Sts GetCallerIdentity
+          role-to-assume: arn:aws:iam::252078852689:role/GitHubAction-AssumeRoleWithAction
+          aws-region: us-west-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to ECR
+        env:
+          ECR_REGISTRY: 252078852689.dkr.ecr.us-west-2.amazonaws.com
+          ECR_REPOSITORY: eva-test
+          IMAGE_TAG: ${{ github.run_number }}
         run: |
-          set -x
-          build_version=${GITHUB_RUN_NUMBER}
-          aws sts get-caller-identity
-          aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 252078852689.dkr.ecr.us-west-2.amazonaws.com
-          docker build -t 252078852689.dkr.ecr.us-west-2.amazonaws.com:$build_version .
-          docker push 252078852689.dkr.ecr.us-west-2.amazonaws.com:$build_version
-          git config --local user.email shinekumar23@gmail.com
-          git config --local user.name shinekumar23
-          git checkout main
-          git pull origin main 
-          sed -i "s/eva-test:[0-9]\+$/eva-test:$build_version/" deployment/dev/deployment.yaml
-          git commit -a -m "Updated version tag"
-          git push origin main
-          aws eks update-kubeconfig --region us-west-2 --name test-eva
-          kubectl get ns
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
