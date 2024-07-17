@@ -31,7 +31,18 @@ jobs:
       # Hello from AWS: WhoAmI
       - name: Sts GetCallerIdentity
         run: |
+          set -x
+          build_version=${GITHUB_RUN_NUMBER}
           aws sts get-caller-identity
-          aws s3 ls
+          aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 252078852689.dkr.ecr.us-west-2.amazonaws.com
+          docker build -t 252078852689.dkr.ecr.us-west-2.amazonaws.com:$build_version .
+          docker push 252078852689.dkr.ecr.us-west-2.amazonaws.com:$build_version
+          git config --local user.email shinekumar23@gmail.com
+          git config --local user.name shinekumar23
+          git checkout main
+          git pull origin main 
+          sed -i "s/eva-test:[0-9]\+$/eva-test:$build_version/" deployment/dev/deployment.yaml
+          git commit -a -m "Updated version tag"
+          git push origin main
           aws eks update-kubeconfig --region us-west-2 --name test-eva
           kubectl get ns
