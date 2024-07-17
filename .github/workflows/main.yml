@@ -9,15 +9,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Configure AWS credentials from GITHUB_TOKEN
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::252078852689:role/GitHubAction-AssumeRoleWithAction
@@ -35,10 +31,16 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          git config --local user.email shinekumar23@gmail.com
-          git config --local user.name shinekumar23
-          git checkout main
-          git pull origin main 
+
+      - name: Update deployment.yaml
+        run: |
           sed -i "s/eva-test:[0-9]\+$/eva-test:$IMAGE_TAG/" deployment/dev/deployment.yaml
-          git commit -a -m "Updated version tag"
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "shinekumar23@gmail.com"
+          git config --local user.name "shinekumar23"
+          git checkout main
+          git pull origin main
+          git commit -a -m "Update deployment.yaml with new image tag"
           git push origin main
