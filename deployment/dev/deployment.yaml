@@ -15,8 +15,5 @@ spec:
       containers:
         - name: content-api
           image: 252078852689.dkr.ecr.us-west-2.amazonaws.com/eva-test:16
-          envFrom:
-            - secretRef:
-                name: db-secrets
           ports:
             - containerPort: 3000
